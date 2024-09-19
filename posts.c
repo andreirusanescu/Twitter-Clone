@@ -76,9 +76,9 @@ post_t *make_post(char *title, unsigned int user_id) {
 void create_post(posts_t **posts) {
 	char *name = strtok(NULL, " \n");
 	char *title = strtok(NULL, "\"");
-	unsigned int id = get_user_id(name);
+	unsigned int uid = get_user_id(name);
 
-	post_t *post = make_post(title, id);
+	post_t *post = make_post(title, uid);
 
 	if ((*posts)->size == (*posts)->capacity) {
 		(*posts)->capacity <<= 1;

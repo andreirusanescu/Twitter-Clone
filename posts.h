@@ -30,6 +30,8 @@ struct posts_t {
 */
 void handle_input_posts(char *input, posts_t *posts);
 
+unsigned int find_pos(posts_t *posts, unsigned int tree_id);
+
 void free_posts(posts_t **posts);
 
 #endif // POSTS_H

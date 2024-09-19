@@ -9,6 +9,6 @@
  *
  * Please add any necessary parameters to the functions
 */
-void handle_input_feed(char *input, posts_t *posts);
+void handle_input_feed(char *input, posts_t *posts, list_graph_t *graph);
 
 #endif // FEED_H

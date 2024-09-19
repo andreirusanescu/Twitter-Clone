@@ -62,7 +62,7 @@ int main(void)
 		#endif
 
 		#ifdef TASK_3
-		handle_input_feed(input, posts);
+		handle_input_feed(input, posts, graph);
 		#endif
 	}
 
