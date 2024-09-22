@@ -3,6 +3,20 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
+#define DIE(assertion, call_description)            \
+	do                                              \
+	{                                               \
+		if (assertion)                              \
+		{                                           \
+			fprintf(stderr, "(%s, %d): ", __FILE__, \
+					__LINE__);                      \
+			perror(call_description);               \
+			exit(errno);                            \
+		}                                           \
+	} while (0)
+
+#define MAX_QUEUE_SIZE 100
+
 typedef struct ll_node_t ll_node_t;
 typedef struct linked_list_t linked_list_t;
 typedef struct queue_t queue_t;

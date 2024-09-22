@@ -5,6 +5,7 @@
 #include "feed.h"
 #include "users.h"
 #include "graph.h"
+#include "hash.h"
 
 void show_feed(posts_t *posts, list_graph_t *graph) {
 	char *name = strtok(NULL, "\n ");
@@ -64,6 +65,93 @@ void friends_repost(posts_t *posts, list_graph_t *graph) {
 	find_friends(current_post, uid, graph);
 }
 
+void bron_kerbosch1(int *p, int *r, int *x, int *res,
+					list_graph_t *graph, int uid, int *maxim) {
+	int cnt = 0, v;
+	for (v = 0; v < 550; ++v) {
+		if (p[v] || x[v]) {
+			++cnt;
+			break;
+		}
+	}
+
+	/* R is a maximal clique */
+	if (!cnt) {
+		int counter = 0;
+		for (v = 0; v < 550; ++v)
+			if (r[v])
+				++counter;
+		if (counter > *maxim) {
+			for (v = 0; v < 550; ++v)
+				res[v] = r[v];
+
+			*maxim = counter;
+		}
+		return;
+	}
+	
+	int *p_intersection, *x_intersection;
+	ll_node_t *util;
+	int neigh;
+	for (v = 0; v < 550; ++v) {
+		/* vertex v is in P */
+		if (p[v]) {
+			// R U v, P intersection with N(v), x intersection with N(v)
+			r[v] = 1;
+			p_intersection = calloc(550, sizeof(int));
+			x_intersection = calloc(550, sizeof(int));
+
+			/* N(v) */
+			util = graph->neighbors[v]->head;
+			while (util) {
+				neigh = *((int *)util->data);
+				if (p[neigh])
+					p_intersection[neigh] = 1;
+
+				if (x[neigh])
+					x_intersection[neigh] = 1;
+
+				util = util->next;
+			}
+			bron_kerbosch1(p_intersection, r, x_intersection, res, graph, uid, maxim);
+			p[v] = 0;
+			x[v] = 1;
+			r[v] = 0;
+			free(p_intersection);
+			free(x_intersection);
+		}
+	}
+}
+
+void common_groups(list_graph_t *graph) {
+	char *name = strtok(NULL, "\n ");
+	int uid = get_user_id(name);
+
+	int p[550] = {0}, r[550] = {0}, x[550] = {0};
+	int *res = malloc(550 * sizeof(int));
+	ll_node_t *util;
+
+	r[uid] = 1;
+
+	/* Set of all the vertices in the subgraph containing
+	   node uid and its neighbors */
+	p[uid] = 1;
+	util = graph->neighbors[uid]->head;
+	while (util) {
+		p[*((int *)util->data)] = 1;
+		util = util->next;
+	}
+	
+	int maxim = 0;
+	bron_kerbosch1(p, r, x, res, graph, uid, &maxim);
+
+	printf("The closest friend group of %s is:\n", name);
+	for (int i = 0; i < 550; ++i)
+		if (res[i])
+			printf("%s\n", get_user_name(i));
+	free(res);
+}
+
 void handle_input_feed(char *input, posts_t *posts, list_graph_t *graph)
 {
 	char *commands = strdup(input);
@@ -78,9 +166,8 @@ void handle_input_feed(char *input, posts_t *posts, list_graph_t *graph)
 		view_profile(posts);
 	else if (!strcmp(cmd, "friends-repost"))
 		friends_repost(posts, graph);
-	else if (!strcmp(cmd, "common-groups"))
-		(void)cmd;
-		// TODO: Add function
+	else if (!strcmp(cmd, "common-group"))
+		common_groups(graph);
 
 	free(commands);
 }

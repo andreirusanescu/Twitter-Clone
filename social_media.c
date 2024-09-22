@@ -34,11 +34,9 @@ void init_tasks(void)
 */
 int main(void)
 {
-	stdout = fopen("test.out", "wt");
-	stdin = fopen("test.in", "rt");
 	init_users();
-
 	init_tasks();
+
 	list_graph_t *graph = lg_create(MAX_PEOPLE);
 	char *input = (char *)malloc(MAX_COMMAND_LEN);
 	posts_t *posts = (posts_t *)malloc(sizeof(posts_t));
@@ -72,7 +70,5 @@ int main(void)
 
 	free_users();
 	free(input);
-	fclose(stdin);
-	fclose(stdout);
 	return 0;
 }
