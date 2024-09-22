@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2024, Andrei Rusanescu <andreirusanescu154gmail.com>
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

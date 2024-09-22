@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2024, <>()
+ */
+
 #include "users.h"
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,5 +1,5 @@
 /**
- * The entrypoint of the homework. Every initialization must be done here
+ * The entrypoint of the program. Every initialization must be done here
 */
 #include <stdlib.h>
 #include <stdio.h>

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2024, <>()
+ */
+
 #include <stdio.h>
 #include "graph.h"
 #include <stdlib.h>

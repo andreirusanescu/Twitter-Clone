@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2024, Andrei Rusanescu <andreirusanescu154gmail.com>
+ */
+
 #ifndef FRIENDS_H
 #define FRIENDS_H
 

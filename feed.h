@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2024, Andrei Rusanescu <andreirusanescu154gmail.com>
+ */
+
 #ifndef FEED_H
 #define FEED_H
 
