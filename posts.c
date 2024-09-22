@@ -5,55 +5,19 @@
 #include "users.h"
 #include "posts.h"
 
+/**
+ * @param post_counter used for the ID of the posts
+ */
 static unsigned int post_counter = 1;
 
+/**
+ * @brief Helper function for create_post
+ * @param title String for the title of the post
+ * if it is NULL, then the return is a repost
+ * @param user_id ID of the user that authored the post
+ * @return Returns a post / repost based on the value of title
+ */
 static
-void free_post_tree(post_t **tree) {
-	if (!*tree) return;
-
-	for (unsigned int i = 0; i < (*tree)->size; ++i)
-		free_post_tree(&(*tree)->events[i]);
-	free((*tree)->events);
-	free((*tree)->v);
-	free((*tree)->title);
-	free((*tree));
-	*tree = NULL;
-}
-
-static
-void preorder(post_t *root, int cnt) {
-	if (!root)
-		return;
-	if (!cnt)
-		printf("\"%s\" - Post by %s\n", root->title, get_user_name(root->user_id));
-	else
-		printf("Repost #%d by %s\n", root->id, get_user_name(root->user_id));
-	for (unsigned int i = 0; i < root->size; ++i)
-		preorder(root->events[i], cnt + 1);
-}
-
-static
-post_t *lca(post_t *root, unsigned int val1, unsigned int val2) {
-	if (!root)
-		return NULL;
-
-	if (root->id == val1 || root->id == val2)
-		return root;
-	post_t *res = NULL, *found;
-	int cnt = 0;
-	for (unsigned int i = 0; i < root->size; ++i) {
-		found = lca(root->events[i], val1, val2);
-		if (found) {
-			++cnt;
-			res = found;
-		}
-	}
-
-	if (cnt == 2)
-		return root;
-	return res;
-}
-
 post_t *make_post(char *title, unsigned int user_id) {
 	post_t *post = (post_t *)calloc(1, sizeof(post_t));
 	post->id = post_counter;
@@ -68,7 +32,7 @@ post_t *make_post(char *title, unsigned int user_id) {
 		post->events = NULL;
 		post->capacity = 0;
 	}
-	post->v = calloc(550, sizeof(unsigned int));
+	post->v = calloc(MAX_PEOPLE, sizeof(unsigned int));
 	post->total_likes = 0;
 	return post;
 }
@@ -93,9 +57,16 @@ void create_post(posts_t **posts) {
 }
 
 unsigned int find_pos(posts_t *posts, unsigned int tree_id) {
-	for (unsigned int i = 0; i < posts->size; ++i)
-		if (posts->posts[i]->id == tree_id)
-			return i;
+	unsigned int l = 0, r = posts->size - 1, mid;
+	while (l <= r) {
+		mid = l + (r - l) / 2;
+		if (posts->posts[mid]->id == tree_id)
+			return mid;
+		else if (posts->posts[mid]->id > tree_id)
+			r = mid - 1;
+		else
+			l = mid + 1;
+	}
 	return 0;
 }
 
@@ -162,6 +133,40 @@ void repost(posts_t **posts) {
 	++post_counter;
 }
 
+/**
+ * @brief Uses LCA approach to find <val1> and <val2> ancestor
+ * @param root Root of the post
+ * @param val1 & @param val2 values to look for
+ * @return Returns LCA for the two values
+ */
+static
+post_t *lca(post_t *root, unsigned int val1, unsigned int val2) {
+	if (!root)
+		return NULL;
+
+	if (root->id == val1 || root->id == val2)
+		return root;
+	post_t *res = NULL, *found;
+	int cnt = 0;
+	for (unsigned int i = 0; i < root->size; ++i) {
+		found = lca(root->events[i], val1, val2);
+
+		/* Counts when a value was found */
+		if (found) {
+			++cnt;
+
+			/* Saves the common root */
+			res = found;
+		}
+	}
+
+	/* If 2 values were found, means the current root is the LCA */
+	if (cnt == 2)
+		return root;
+	/* NULL or the one common root that was found */
+	return res;
+}
+
 void common_repost(posts_t *posts) {
 	unsigned int tree_id = atoi(strtok(NULL, " \n"));
 	unsigned int pos = find_pos(posts, tree_id);
@@ -210,7 +215,15 @@ void like(posts_t *posts) {
 	}	
 }
 
-void check_ratio(post_t *root, unsigned int *max_likes, unsigned int *max_id) {
+/**
+ * @brief Helper function for @ratio
+ * @param root Root / Post
+ * @param max_likes Maximal value for likes hit on this thread
+ * @param max_id The ID of the post / repost with the <max_likes>
+ */
+static
+void check_ratio(post_t *root, unsigned int *max_likes,
+				 unsigned int *max_id) {
 	if (!root)
 		return;
 	if (root->total_likes > *max_likes) {
@@ -224,7 +237,6 @@ void check_ratio(post_t *root, unsigned int *max_likes, unsigned int *max_id) {
 
 	for (unsigned int i = 0; i < root->size; ++i)
 		check_ratio(root->events[i], max_likes, max_id);
-
 }
 
 void ratio(posts_t *posts) {
@@ -238,6 +250,24 @@ void ratio(posts_t *posts) {
 		printf("Post %d got ratio'd by repost %d\n", post_id, max_id);
 	else
 		printf("The original post is the highest rated\n");
+}
+
+/**
+ * @brief Helper function for @delete
+ * Postorder approach of deleting a tree
+ * @param tree Pointer to the post to be deleted
+ */
+static
+void free_post_tree(post_t **tree) {
+	if (!*tree) return;
+
+	for (unsigned int i = 0; i < (*tree)->size; ++i)
+		free_post_tree(&(*tree)->events[i]);
+	free((*tree)->events);
+	free((*tree)->v);
+	free((*tree)->title);
+	free((*tree));
+	*tree = NULL;
 }
 
 void delete(posts_t *posts) {
@@ -276,6 +306,23 @@ void get_likes(posts_t *posts) {
 		post_t *rep = find_repost(current_post, atoi(tmp), &prev, &pos);
 		printf("Repost #%d has %d likes\n", rep->id, rep->total_likes);
 	}
+}
+
+/**
+ * @brief Preorder parsing of a tree
+ * @param root Current root
+ * @param cnt If cnt is 0 => post, otherwise repost
+ */
+static
+void preorder(post_t *root, int cnt) {
+	if (!root)
+		return;
+	if (!cnt)
+		printf("\"%s\" - Post by %s\n", root->title, get_user_name(root->user_id));
+	else
+		printf("Repost #%d by %s\n", root->id, get_user_name(root->user_id));
+	for (unsigned int i = 0; i < root->size; ++i)
+		preorder(root->events[i], cnt + 1);
 }
 
 void get_reposts(posts_t *posts) {

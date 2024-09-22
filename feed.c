@@ -5,7 +5,6 @@
 #include "feed.h"
 #include "users.h"
 #include "graph.h"
-#include "hash.h"
 
 void show_feed(posts_t *posts, list_graph_t *graph) {
 	char *name = strtok(NULL, "\n ");
@@ -22,6 +21,14 @@ void show_feed(posts_t *posts, list_graph_t *graph) {
 	}
 }
 
+/**
+ * @brief: Helper function for view_profile,
+ * recursively parses the tree of posts for
+ * a post / repost created by user <uid>
+ * @param post Post to look through
+ * @param uid User ID
+ * @param title title of the post
+ */
 static
 void check_post_for_profile(post_t *post, unsigned int uid, char *title) {
 	if (!post) return;
@@ -44,6 +51,13 @@ void view_profile(posts_t *posts) {
 		check_post_for_profile(posts->posts[i], user_id, posts->posts[i]->title);
 }
 
+/**
+ * @brief Helper function for friends_repost: shows all the friends
+ * of a user that reposted a given post
+ * @param post Post to look through
+ * @param uid User ID
+ * @param graph Graph of connections
+ */
 static
 void find_friends(post_t *post, unsigned int uid, list_graph_t *graph) {
 	if (!post) return;
@@ -66,23 +80,24 @@ void friends_repost(posts_t *posts, list_graph_t *graph) {
 }
 
 void bron_kerbosch1(int *p, int *r, int *x, int *res,
-					list_graph_t *graph, int uid, int *maxim) {
+					list_graph_t *graph, int *maxim) {
 	int cnt = 0, v;
-	for (v = 0; v < 550; ++v) {
+	for (v = 0; v < MAX_PEOPLE; ++v) {
 		if (p[v] || x[v]) {
 			++cnt;
 			break;
 		}
 	}
 
-	/* R is a maximal clique */
+	/* R is a potential maximal clique */
 	if (!cnt) {
 		int counter = 0;
-		for (v = 0; v < 550; ++v)
+		for (v = 0; v < MAX_PEOPLE; ++v)
 			if (r[v])
 				++counter;
+		/* R is indeed a maximal clique */
 		if (counter > *maxim) {
-			for (v = 0; v < 550; ++v)
+			for (v = 0; v < MAX_PEOPLE; ++v)
 				res[v] = r[v];
 
 			*maxim = counter;
@@ -93,13 +108,13 @@ void bron_kerbosch1(int *p, int *r, int *x, int *res,
 	int *p_intersection, *x_intersection;
 	ll_node_t *util;
 	int neigh;
-	for (v = 0; v < 550; ++v) {
+	for (v = 0; v < MAX_PEOPLE; ++v) {
 		/* vertex v is in P */
 		if (p[v]) {
-			// R U v, P intersection with N(v), x intersection with N(v)
+			/* R U v, P intersection with N(v), x intersection with N(v) */
 			r[v] = 1;
-			p_intersection = calloc(550, sizeof(int));
-			x_intersection = calloc(550, sizeof(int));
+			p_intersection = calloc(MAX_PEOPLE, sizeof(int));
+			x_intersection = calloc(MAX_PEOPLE, sizeof(int));
 
 			/* N(v) */
 			util = graph->neighbors[v]->head;
@@ -113,9 +128,15 @@ void bron_kerbosch1(int *p, int *r, int *x, int *res,
 
 				util = util->next;
 			}
-			bron_kerbosch1(p_intersection, r, x_intersection, res, graph, uid, maxim);
+			bron_kerbosch1(p_intersection, r, x_intersection, res, graph, maxim);
+
+			/* removes vertex from the potential nodes*/
 			p[v] = 0;
+
+			/* adds vertex to the forbidden set */
 			x[v] = 1;
+
+			/* removal of the vertex after the recursive call */
 			r[v] = 0;
 			free(p_intersection);
 			free(x_intersection);
@@ -127,11 +148,9 @@ void common_groups(list_graph_t *graph) {
 	char *name = strtok(NULL, "\n ");
 	int uid = get_user_id(name);
 
-	int p[550] = {0}, r[550] = {0}, x[550] = {0};
-	int *res = malloc(550 * sizeof(int));
+	int p[MAX_PEOPLE] = {0}, r[MAX_PEOPLE] = {0}, x[MAX_PEOPLE] = {0};
+	int *res = malloc(MAX_PEOPLE * sizeof(int));
 	ll_node_t *util;
-
-	r[uid] = 1;
 
 	/* Set of all the vertices in the subgraph containing
 	   node uid and its neighbors */
@@ -143,10 +162,10 @@ void common_groups(list_graph_t *graph) {
 	}
 	
 	int maxim = 0;
-	bron_kerbosch1(p, r, x, res, graph, uid, &maxim);
+	bron_kerbosch1(p, r, x, res, graph, &maxim);
 
 	printf("The closest friend group of %s is:\n", name);
-	for (int i = 0; i < 550; ++i)
+	for (int i = 0; i < MAX_PEOPLE; ++i)
 		if (res[i])
 			printf("%s\n", get_user_name(i));
 	free(res);

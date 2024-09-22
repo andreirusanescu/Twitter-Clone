@@ -118,7 +118,8 @@ void popular(list_graph_t *graph) {
 	}
 
 	if (max_id != id)
-		printf("%s is the most popular friend of %s\n", get_user_name(max_id), get_user_name(id));
+		printf("%s is the most popular friend of %s\n",
+			   get_user_name(max_id), get_user_name(id));
 	else
 		printf("%s is the most popular\n", get_user_name(max_id));
 }

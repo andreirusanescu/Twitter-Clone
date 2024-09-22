@@ -16,6 +16,7 @@
 	} while (0)
 
 #define MAX_QUEUE_SIZE 100
+#define MAX_PEOPLE 550
 
 typedef struct ll_node_t ll_node_t;
 typedef struct linked_list_t linked_list_t;

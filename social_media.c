@@ -35,8 +35,8 @@ void init_tasks(void)
 int main(void)
 {
 	init_users();
-	init_tasks();
 
+	init_tasks();
 	list_graph_t *graph = lg_create(MAX_PEOPLE);
 	char *input = (char *)malloc(MAX_COMMAND_LEN);
 	posts_t *posts = (posts_t *)malloc(sizeof(posts_t));
