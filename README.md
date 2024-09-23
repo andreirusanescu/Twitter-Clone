@@ -1,4 +1,4 @@
-# Twitter Clone: Advanced Social Network and Post-Repost System
+# Twitter Clone: Advanced Social Network
 
 Twitter Clone is an advanced social network simulation designed to model complex
 user relationships and interactions through posts and reposts. Built to
