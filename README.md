@@ -151,7 +151,7 @@ ratio <post-id>
     > ratio 1
     < Post 1 got ratio'd by repost 2>
 
-## 3. Advanced Features
+## 3. Maximal Clique Detection and other features
 
     Common Group Detection: Automatically detects cliques within a user’s friend network,
     identifying the largest group of mutually connected friends.
