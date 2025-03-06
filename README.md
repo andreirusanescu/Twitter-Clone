@@ -6,12 +6,6 @@ replicate and extend the core functionalities of social media platforms like
 `Twitter`, this system allows users to manage friendships, create content, and
 interact in a dynamic environment with highly efficient algorithms.
 
-With a focus on scalability, flexibility, and performance, the system is capable
-of handling thousands of user interactions in real-time, making it ideal for
-large-scale social network simulations or feature-rich web applications.
-
-## Key Metrics:
-
 - `Friendship Management`: Supports up to 100,000+ bidirectional user connections
                            with an optimized query system for real-time
                            suggestions, distance calculations, and popularity
