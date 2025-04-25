@@ -6,7 +6,7 @@ replicate and extend the core functionalities of social media platforms like
 `Twitter`, this system allows users to manage friendships, create content, and
 interact in a dynamic environment with highly efficient algorithms.
 
-- `Friendship Management`: Supports up to 100,000+ bidirectional user connections
+- `Friendship Management`: Supports up to 100.000+ bidirectional user connections
                            with an optimized query system for real-time
                            suggestions, distance calculations, and popularity
                            rankings.
@@ -23,7 +23,7 @@ interact in a dynamic environment with highly efficient algorithms.
                 low latency under heavy workloads typical for social media
                 platforms.
 
-## Features
+
 ## 1. Friendship Network
 
 Mirroring Twitter's "follow" system, Twitter Clone establishes a more intimate
@@ -155,14 +155,11 @@ ratio <post-id>
     complex engagement analysis and repost history tracking.
 
 
-Unlike standard social network clones, Twitter Clone provides a more nuanced and powerful
+Unlike standard social network clones, this app provides a more nuanced and powerful
 set of tools for managing social interactions and content engagement. By blending the core
 features of leading social platforms (Twitter’s posts/retweets, Facebook’s mutual friends,
-and LinkedIn’s connection degrees), Twitter Clone offers:
+and LinkedIn’s connection degrees), it offers:
 
     99.9% uptime due to its robust infrastructure.
     Up to 20% faster query performance compared to traditional social network models.
     Real-time engagement analysis with dynamic content suggestions and repost tracking.
-
-This project is ideal for large-scale social simulations, performance benchmarking, and
-real-world applications in social media platforms.
